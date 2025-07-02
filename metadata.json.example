@@ -1,0 +1,38 @@
+{
+  "required_map_keys": [
+    "maps/【Map】17号城市 City 17.zip",
+    "maps/【Map】Divine Cybermancy 异度神兆.zip",
+    "maps/【Map】万里 Wanli.zip",
+    "maps/【Map】17号城x市 City 17.zip"
+  ],
+  "downloaded_maps": [
+    {
+      "key": "maps/【Map】17号城市 City 17.zip",
+      "lastModified": "2025-04-02T03:30:02.000Z",
+      "extractedFiles": [
+        "【Map】17号城市 City 17.vpk"
+      ]
+    },
+    {
+      "key": "maps/【Map】Divine Cybermancy 异度神兆.zip",
+      "lastModified": "2025-04-02T03:30:02.000Z",
+      "extractedFiles": [
+        "【Map】Divine Cybermancy 异度神兆.vpk",
+        "【Map】Divine Cybermancy 异度神兆2.vpk",
+        "【Map】Divine Cybermancy 异度神兆3.vpk",
+        "【Map】Divine Cybermancy 异度神兆4.vpk",
+        "【Map】Divine Cybermancy 异度神兆5.vpk",
+        "【Map】Divine Cybermancy 异度神兆6.vpk",
+        "【Map】Divine Cybermancy 异度神兆7.vpk",
+        "【Map】Divine Cybermancy 异度神兆8.vpk"
+      ]
+    },
+    {
+      "key": "maps/【Map】万里 Wanli.zip",
+      "lastModified": "2025-04-02T03:30:05.000Z",
+      "extractedFiles": [
+        "【Map】万里 Wanli.vpk"
+      ]
+    }
+  ]
+}
