@@ -2,6 +2,44 @@ import config from "./config.js";
 import fs from 'fs/promises';
 import fsc from 'fs';
 import path from "path";
+import enquirer from "enquirer";
+
+export async function confirm(message = '确定吗？', enabled = '是', disabled = '否') {
+    const { Toggle } = enquirer;
+
+    const prompt = new Toggle({
+        message,
+        enabled,
+        disabled,
+    });
+
+    return prompt.run()
+}
+
+export async function select(choices, message = '选择一项') {
+    const { Select } = enquirer;
+
+    const prompt = new Select({
+        name: 'operation',
+        message: message,
+        choices: choices
+    });
+
+    return prompt.run()
+}
+
+export async function multiSelect(choices, limit = 0, message = '选择多项') {
+    const { MultiSelect } = enquirer;
+
+    const prompt = new MultiSelect({
+        name: 'operation',
+        limit,
+        message: message,
+        choices: choices
+    });
+
+    return prompt.run()
+}
 
 export async function initMapStorage() {
     await fs.mkdir(config.files.mapPath, {
@@ -10,23 +48,19 @@ export async function initMapStorage() {
 }
 
 export async function initMetadataFile() {
-    if (fsc.existsSync(config.files.metadataFilePath)) {
-        return;
-    }
-
-    const metadata = {
-        required_map_keys: [],
-        downloaded_maps: []
-    }
-
     await fs.mkdir(path.dirname(config.files.metadataFilePath), {
         recursive: true
     })
 
-    await fs.writeFile(config.files.metadataFilePath, JSON.stringify(metadata, null, 2), {
-        encoding: 'utf-8',
-        flag: 'w'
-    })
+    if (!fsc.existsSync(config.files.metadataFilePath)) {
+        await fs.writeFile(config.files.metadataFilePath, JSON.stringify({
+            required_map_keys: [],
+            downloaded_maps: []
+        }, null, 2), {
+            encoding: 'utf-8',
+            flag: 'wx'
+        })
+    }
 }
 
 export async function getMetadata() {
@@ -46,6 +80,49 @@ export async function putMetadata(metadata) {
         encoding: 'utf-8',
         flag: 'w'
     })
+}
+
+export async function addRequiredMaps() {
+    let metadata = await getMetadata()
+    let maps = metadata.required_map_keys
+
+    console.log('加载中...');
+    const mapList = await getMapList();
+
+    metadata.required_map_keys = maps.concat(await multiSelect(mapList.map(e => e.Key)
+        .filter(e => !maps.includes(e))
+    ))
+
+    console.log(metadata.required_map_keys)
+
+    await putMetadata(metadata)
+}
+
+export async function removeRequiredMaps() {
+    let metadata = await getMetadata()
+    if (!metadata.required_map_keys.length) {
+        console.log('没有可供删除的地图');
+        return;
+    }
+
+    let mapsToRemove = await multiSelect([...metadata.required_map_keys])
+
+    for (let i = 0; i < mapsToRemove.length; i++) {
+        const map = mapsToRemove[i];
+        if (!metadata.downloaded_maps.find(e => e.key === map)) {
+            continue;
+        }
+        metadata.downloaded_maps.find(e => e.key === map).extractedFiles.forEach(e => {
+            fs.rm(path.join(config.files.mapPath, e)).catch(e => {
+                console.warn(`未能删除：${key}`, e)
+            });
+        });
+    }
+
+    metadata.required_map_keys = metadata.required_map_keys.filter(e => !mapsToRemove.includes(e))
+    metadata.downloaded_maps = metadata.downloaded_maps.filter(e => !mapsToRemove.includes(e.key));
+
+    await putMetadata(metadata)
 }
 
 export async function getMapList() {

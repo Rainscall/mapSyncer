@@ -8,8 +8,8 @@ const config = {
     s3Endpoint: 'https://5sim.tos-s3-cn-hongkong.bytepluses.com',
     files: {
         metadataFilePath: path.join(__dirname, 'metadata', 'metadata.json'),
-        // mapPath: path.join(__dirname, '../left4dead2/addons/workshop'),
-        mapPath: path.join(__dirname, 'left4dead2/addons/workshop'),
+        mapPath: path.join(__dirname, '../left4dead2/addons/workshop'),
+        // mapPath: path.join(__dirname, 'left4dead2/addons/workshop'),
     }
 }
 
