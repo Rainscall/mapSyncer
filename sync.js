@@ -20,7 +20,7 @@ export async function sync() {
             .filter(e => mapList.map(e => e.Key).includes(e) &&
                 mapList.find(item => item.Key === e)
                     .LastModified !== downloadedMaps
-                        .find(item => item.key === e)?.lastModified);
+                        ?.find(item => item.key === e)?.lastModified);
 
     if (!mapsToDownload.length) {
         console.log('无需进行同步')

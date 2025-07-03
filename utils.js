@@ -3,6 +3,78 @@ import fs from 'fs/promises';
 import fsc from 'fs';
 import path from "path";
 import enquirer from "enquirer";
+import Table from 'cli-table3';
+
+/**
+ * 将一个字符串数组以表格形式打印到终端，并最大化利用横向空间。
+ * @param {string[]} items - 需要打印的字符串数组。
+ * @param {object} [options] - 可选配置项。
+ * @param {number} [options.padding=3] - 每列的额外间距（用于' | '）。
+ */
+export function printGrid(items, options = {}) {
+    if (!Array.isArray(items) || items.length === 0) {
+        items = ['<empty array>']
+    }
+
+    const { padding = 3 } = options; // 每个单元格左右的 padding 和边框，' | ' 大约占3个字符
+
+    // 1. 获取终端宽度，提供一个默认值
+    const terminalWidth = process.stdout.columns || 80;
+
+    // 2. 找到最长字符串的长度
+    const longestItemLength = Math.max(...items.map(item => String(item).length));
+
+    // 3. 计算最佳列数
+    // 每一列的最小宽度 = 最长字符串长度 + padding
+    // 总宽度 / 每一列的最小宽度 = 理论上的最大列数
+    let numColumns = Math.floor(terminalWidth / (longestItemLength + padding));
+    // 确保至少有1列，防止终端过窄导致列数为0
+    numColumns = Math.max(1, numColumns);
+
+    // 4. 根据列数，重新计算并均分实际的列宽，使表格撑满终端
+    // 总边框宽度 = 列数 + 1 (例如3列有4个'|')
+    const totalBorderWidth = numColumns + 1;
+    // 除去所有边框后，可用于内容的总宽度
+    const availableContentWidth = terminalWidth - totalBorderWidth;
+    // 每列可以分配到的内容宽度
+    const colWidth = Math.floor(availableContentWidth / numColumns);
+
+    // 如果计算出的列宽小于最长字符串，cli-table3 会自动换行
+    // 这在终端极度狭窄时是合理的行为
+
+    // 5. 创建 cli-table3 实例
+    const table = new Table({
+        // 我们不需要表头，所以 head 为空
+        head: [],
+        // 设置所有列的宽度
+        colWidths: Array(numColumns).fill(colWidth),
+        // 开启自动换行，以应对列宽小于内容长度的极端情况
+        wordWrap: true,
+    });
+
+    // 6. 重构数据并推入表格
+    for (let i = 0; i < items.length; i += numColumns) {
+        const row = items.slice(i, i + numColumns);
+        table.push(row);
+    }
+
+    // 7. 打印表格
+    console.log(table.toString());
+}
+
+export async function uploadText(text) {
+    let r = await fetch('https://as.al/api/create', {
+        method: 'POST',
+        body: JSON.stringify({
+            content: text,
+            isPrivate: false,
+            language: "text",
+            share_password: ""
+        })
+    }).then(r => r.json());
+
+    return `https://as.al/raw/${(new URL(r.url)).pathname.split('/')[2]}`;
+}
 
 export async function confirm(message = '确定吗？', enabled = '是', disabled = '否') {
     const { Toggle } = enquirer;
