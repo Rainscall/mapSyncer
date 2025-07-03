@@ -1,5 +1,21 @@
 import { sync } from "./sync.js";
 import { addRequiredMaps, confirm, getMetadata, initMapStorage, initMetadataFile, removeRequiredMaps, select } from "./utils.js";
+import { execSync } from "child_process";
+import nodeDiskInfo from "node-disk-info";
+
+execSync('reset');
+const diskInfo = nodeDiskInfo.getDiskInfoSync().reduce((max, current) => {
+    return current._blocks > max._blocks ? current : max;
+})
+
+console.table([
+    {
+        总空间: `${(diskInfo._blocks / 1024 / 1024).toFixed(2)} GiB`,
+        已使用: `${(diskInfo._used / 1024 / 1024).toFixed(2)} GiB`,
+        可用: `${(diskInfo._available / 1024 / 1024).toFixed(2)} GiB`,
+        占比: diskInfo._capacity
+    }
+])
 
 await initMapStorage()
 await initMetadataFile()

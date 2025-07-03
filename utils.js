@@ -89,9 +89,10 @@ export async function addRequiredMaps() {
     console.log('加载中...');
     const mapList = await getMapList();
 
-    metadata.required_map_keys = maps.concat(await multiSelect(mapList.map(e => e.Key)
-        .filter(e => !maps.includes(e))
-    ))
+    metadata.required_map_keys = maps.concat(await multiSelect(
+        mapList.map(e => `${(e.Size / 1024 / 1024).toFixed(2)}Mib\t\u200b${e.Key}`)
+            .filter(e => !maps.includes(e.split('\u200b')[1]))
+    ).then(e => e.map(e => e.split('\u200b')[1])))
 
     console.log(metadata.required_map_keys)
 
@@ -113,8 +114,8 @@ export async function removeRequiredMaps() {
             continue;
         }
         metadata.downloaded_maps.find(e => e.key === map).extractedFiles.forEach(e => {
-            fs.rm(path.join(config.files.mapPath, e)).catch(e => {
-                console.warn(`未能删除：${key}`, e)
+            fs.rm(path.join(config.files.mapPath, e)).catch(error => {
+                console.warn(`未能删除：${e}`, error)
             });
         });
     }
