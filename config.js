@@ -5,7 +5,7 @@ const __dirname = path.dirname(__filename);
 
 const config = {
     l4d2ListEndpoint: 'https://backend.union.l4d2list.api.colorspark.net',
-    s3Endpoint: 'https://5sim.tos-s3-cn-hongkong.bytepluses.com',
+    s3Endpoint: 'https://kita.tos-cn-shanghai.bytepluses.com.cn',
     files: {
         metadataFilePath: path.join(__dirname, 'metadata', 'metadata.json'),
         mapPath: path.join(__dirname, '../left4dead2/addons/workshop'),
