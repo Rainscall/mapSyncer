@@ -185,11 +185,16 @@ export async function removeRequiredMaps() {
         if (!metadata.downloaded_maps.find(e => e.key === map)) {
             continue;
         }
-        metadata.downloaded_maps.find(e => e.key === map).extractedFiles.forEach(e => {
-            fs.rm(path.join(config.files.mapPath, e)).catch(error => {
-                console.warn(`未能删除：${e}`, error)
+
+        let extractedFiles = metadata.downloaded_maps.find(e => e.key === map).extractedFiles
+        for (let j = 0; j < extractedFiles.length; j++) {
+            const file = extractedFiles[j];
+            console.log('正在删除', file)
+            await fs.rm(path.join(config.files.mapPath, file)).catch(error => {
+                console.warn(`未能删除：${file}`, error)
             });
-        });
+
+        }
     }
 
     metadata.required_map_keys = metadata.required_map_keys.filter(e => !mapsToRemove.includes(e))
