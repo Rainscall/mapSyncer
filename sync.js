@@ -50,6 +50,7 @@ export async function sync() {
 
     console.log('已获取元数据：', mapsToDownload)
 
+    let totalSaved = 0;
     for (let i = 0; i < mapsToDownload.length; i++) {
         const map = mapsToDownload[i];
         console.log(`正在下载：${map.key}`);
@@ -86,20 +87,25 @@ export async function sync() {
                 continue;
             }
             const tempFilePath = path.join(config.files.mapPath, `#temp#${e}`);
+            await fs.promises.rename(path.join(config.files.mapPath, e), tempFilePath);
+
+            let beforeCompress = (await fs.promises.stat(tempFilePath)).size;
             console.log('正在压缩：', e);
 
-            await fs.promises.rename(path.join(config.files.mapPath, e), tempFilePath);
             await processVpk(tempFilePath, path.join(config.files.mapPath, e));
             await fs.promises.rm(tempFilePath);
-            console.log('');
+
+            const saved = (beforeCompress - (await fs.promises.stat(path.join(config.files.mapPath, e))).size) / 1024 / 1024;
+            totalSaved += saved;
+            console.log(`此VPK节省 ${saved.toFixed(2)}Mib`)
         }
 
         metadata.downloaded_maps = metadata.downloaded_maps.filter(e => e.key !== map.key)
         metadata.downloaded_maps.push(map)
 
-        console.log(`解压完成`);
+        console.log(`解压完成\n`);
     }
 
-    console.log(`同步完成`);
+    console.log(`同步完成，共节省 ${totalSaved.toFixed(2)}Mib`);
     await putMetadata(metadata)
 }

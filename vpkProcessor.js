@@ -146,6 +146,10 @@ export async function processVpk(inputFilePath, outputFilePath) {
         // 5c. 逐个流式写入文件数据
         console.log('Streaming file data...');
         for (const entry of newEntriesForTree) {
+            if (entry.entryLength === 0) {
+                console.warn('Skipping an empty file.');
+                continue;
+            }
             const readStream = fs.createReadStream(inputFilePath, {
                 start: originalDataOffset + entry.entryOffset,
                 end: originalDataOffset + entry.entryOffset + entry.entryLength - 1,
