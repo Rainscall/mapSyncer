@@ -82,6 +82,9 @@ export async function sync() {
 
         for (let j = 0; j < map.extractedFiles.length; j++) {
             const e = map.extractedFiles[j];
+            if (!/\.vpk$/.test(e)) {
+                continue;
+            }
             const tempFilePath = path.join(config.files.mapPath, `#temp#${e}`);
             console.log('正在压缩：', e);
 
