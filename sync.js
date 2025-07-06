@@ -5,6 +5,7 @@ import path from "path";
 import fetch from "node-fetch";
 import unzipper from "unzipper";
 import il from 'iconv-lite';
+import { processVpk } from "./vpkProcessor.js";
 
 export async function sync() {
     let metadata = await getMetadata();
@@ -77,7 +78,18 @@ export async function sync() {
                 .on('finish', resolve)
         })
 
-        fs.promises.rm(zipFilePath);
+        await fs.promises.rm(zipFilePath);
+
+        for (let j = 0; j < map.extractedFiles.length; j++) {
+            const e = map.extractedFiles[j];
+            const tempFilePath = path.join(config.files.mapPath, `#temp#${e}`);
+            console.log('正在压缩：', e);
+
+            await fs.promises.rename(path.join(config.files.mapPath, e), tempFilePath);
+            await processVpk(tempFilePath, path.join(config.files.mapPath, e));
+            await fs.promises.rm(tempFilePath);
+            console.log('');
+        }
 
         metadata.downloaded_maps = metadata.downloaded_maps.filter(e => e.key !== map.key)
         metadata.downloaded_maps.push(map)
