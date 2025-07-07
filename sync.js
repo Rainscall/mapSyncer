@@ -92,12 +92,17 @@ export async function sync() {
             let beforeCompress = (await fs.promises.stat(tempFilePath)).size;
             console.log('正在压缩：', e);
 
-            await processVpk(tempFilePath, path.join(config.files.mapPath, e));
-            await fs.promises.rm(tempFilePath);
-
-            const saved = (beforeCompress - (await fs.promises.stat(path.join(config.files.mapPath, e))).size) / 1024 / 1024;
-            totalSaved += saved;
-            console.log(`此VPK节省 ${saved.toFixed(2)}Mib`)
+            try {
+                await processVpk(tempFilePath, path.join(config.files.mapPath, e));
+                await fs.promises.rm(tempFilePath);
+                const saved = (beforeCompress - (await fs.promises.stat(path.join(config.files.mapPath, e))).size) / 1024 / 1024;
+                totalSaved += saved;
+                console.log(`此VPK节省 ${saved.toFixed(2)}Mib`)
+            } catch (error) {
+                console.log(error)
+                console.log('压缩失败，回滚操作')
+                await fs.promises.rename(tempFilePath, path.join(config.files.mapPath, e));
+            }
         }
 
         metadata.downloaded_maps = metadata.downloaded_maps.filter(e => e.key !== map.key)

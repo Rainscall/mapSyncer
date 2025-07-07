@@ -204,7 +204,7 @@ export async function removeRequiredMaps() {
 }
 
 export async function getMapList() {
-    let r = await fetch('https://backend.union.l4d2list.api.colorspark.net/storage/list/maps').then(r => r.json());
+    let r = await fetch(`${config.l4d2ListEndpoint}/storage/list/maps`).then(r => r.json());
     if (r.status !== 'SUCCESS') {
         throw new Error(`Failed to fetch map list: ${r.status}`);
     }
