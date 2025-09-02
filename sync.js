@@ -109,6 +109,7 @@ export async function sync() {
         metadata.downloaded_maps.push(map)
 
         console.log(`解压完成\n`);
+        await putMetadata(metadata)
     }
 
     console.log(`同步完成，共节省 ${totalSaved.toFixed(2)}Mib`);

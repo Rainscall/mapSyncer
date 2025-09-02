@@ -70,11 +70,12 @@ export async function processVpk(inputFilePath, outputFilePath) {
                     treeParseOffset += 18;
 
                     // 检查文件名是否包含非 ASCII 字符
-                    const isExcludedByExtension = excludedExtensions.has(ext.toLowerCase());
-                    const hasNonAsciiFilename = nonAsciiRegex.test(filename);
+                    if (nonAsciiRegex.test(filename)) {
+                        throw new Error("Got Non-ASCII Filename");
+                    }
 
-                    // 如果文件后缀和文件名都未被过滤，则保留该文件
-                    if (!isExcludedByExtension && !hasNonAsciiFilename) {
+                    // 如果文件后缀未被过滤，则保留该文件
+                    if (!excludedExtensions.has(ext.toLowerCase())) {
                         filteredEntries.push({
                             ext, path, filename,
                             crc: entryDataBuffer.readUInt32LE(0),
