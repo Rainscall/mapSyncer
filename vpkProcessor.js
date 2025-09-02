@@ -30,7 +30,7 @@ function readNullTerminatedString(buffer, offset) {
 export async function processVpk(inputFilePath, outputFilePath) {
     console.log(`Starting VPK processing for: ${inputFilePath}`);
 
-    const excludedExtensions = new Set(['wav', 'mp3', 'vtf']);
+    const excludedExtensions = new Set(['wav', 'mp3', 'vtf', 'vmf', 'vmx']);
     // 正则表达式，用于检测非 ASCII 字符
     const nonAsciiRegex = /[^\x00-\x7F]/;
     let inputFile;
